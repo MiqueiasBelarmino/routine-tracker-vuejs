@@ -13,8 +13,8 @@
     <div
       class="actions hidden absolute right-0 h-full group-hover:flex items-center rounded justify-between bg-gray-200 px-2"
     >
-      <edit-icon class="mr-2" />
-      <remove-icon />
+      <edit-icon @click="this.$emit('clickEdit')" class="mr-2" />
+      <remove-icon @click="this.$emit('clickRemove')" />
     </div>
   </li>
 </template>
