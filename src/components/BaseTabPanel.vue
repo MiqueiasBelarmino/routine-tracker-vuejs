@@ -4,12 +4,13 @@
       <base-box
         @click-edit="this.$emit('clickEdit')"
         @click-remove="this.$emit('clickRemove')"
+        @toggle="this.$emit('toggle',item.id)"
         :done="false"
         v-for="item in items"
         :key="item.id"
       >
         <template v-slot:text>
-          {{ item.title }}
+          {{ item.name }}
         </template>
       </base-box>
     </ul>

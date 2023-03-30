@@ -43,6 +43,7 @@ export default {
   methods: {
     toggleItem() {
       this.isDone = !this.isDone;
+      this.$emit('toggle');
     },
   },
 };

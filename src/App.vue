@@ -67,30 +67,29 @@
       <base-modal :isOpen="isRemoveOpen" @close="closeRemoveModal">
         <template v-slot:title>Remove Habit</template>
         <template v-slot:content>
-            <div class="p-6 text-center">
-              <h3
-                class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400"
-              >
-                Are you sure you want to delete this habit?
-              </h3>
-              <button
-                data-modal-hide="popup-modal"
-                @click="closeRemoveModal"
-                type="button"
-                class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
-              >
-                Yes, I'm sure
-              </button>
-              <button
-                data-modal-hide="popup-modal"
-                @click="closeRemoveModal"
-                type="button"
-                class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-              >
-                No, cancel
-              </button>
-            </div>
-
+          <div class="p-6 text-center">
+            <h3
+              class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400"
+            >
+              Are you sure you want to delete this habit?
+            </h3>
+            <button
+              data-modal-hide="popup-modal"
+              @click="closeRemoveModal"
+              type="button"
+              class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
+            >
+              Yes, I'm sure
+            </button>
+            <button
+              data-modal-hide="popup-modal"
+              @click="closeRemoveModal"
+              type="button"
+              class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+            >
+              No, cancel
+            </button>
+          </div>
         </template>
       </base-modal>
 
@@ -102,10 +101,12 @@
 
         <TabPanels class="mt-4">
           <base-tab-panel
+            v-if="habits.available"
             @click-edit="openEditModal"
             @click-remove="openRemoveModal"
+            @toggle="toggleHabit"
             title="Habits"
-            :items="habits"
+            :items="habits.available"
           />
           <base-tab-panel title="Tasks" :items="todos" />
         </TabPanels>
@@ -125,6 +126,7 @@ import BaseTab from "@/components/BaseTab.vue";
 import BaseTabPanel from "@/components/BaseTabPanel.vue";
 import BaseWeekDayPicker from "@/shared/BaseWeekDayPicker.vue";
 import BaseModal from "@/shared/BaseModal.vue";
+import { getHabits, getHabitsByDay, toggleHabit } from "@/services/habits";
 
 export default {
   components: {
@@ -145,31 +147,25 @@ export default {
     return {
       isEditOpen: false,
       isRemoveOpen: false,
-      habits: [
-        { id: 1, title: "Banho no pet" },
-        { id: 2, title: "Lavar banheiro" },
-        { id: 3, title: "Leitura matinal" },
-        { id: 4, title: "corrida matinal" },
-        { id: 5, title: "tomar 3l de agua" },
-        { id: 6, title: "Praticar atividades fisicas !!!" },
-        { id: 7, title: "regar as plantas" },
-        { id: 8, title: "Estudar teoria musical" },
-        { id: 9, title: "Praticar cello" },
-      ],
+      habits: {
+        available: [],
+        completed: [],
+      },
       todos: [
-        { id: 1, title: "comprar pomada" },
-        { id: 2, title: "comprar vitamina d" },
-        { id: 3, title: "comprar vw 1" },
-        { id: 4, title: "ir na padaria" },
-        { id: 5, title: "teste" },
-        { id: 6, title: "Using Tailwind CSS" },
-        { id: 7, title: "Using Tailwind CSS" },
-        { id: 8, title: "Using Tailwind CSS" },
-        { id: 9, title: "Using Tailwind CSS" },
+        { id: 2, name: "comprar vitamina" },
+        { id: 3, name: "comprar vw 1" },
+        { id: 4, name: "ir na padaria" },
       ],
     };
   },
+  mounted() {
+    this.fetchHabits();
+  },
   methods: {
+    async fetchHabits() {
+      const { availableHabits } = await getHabits();
+      this.habits.available = availableHabits;
+    },
     closeEditModal() {
       this.isEditOpen = false;
     },
