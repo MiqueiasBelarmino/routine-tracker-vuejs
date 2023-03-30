@@ -3,7 +3,7 @@
     <div
       class="container items-center justify-center w-full max-w-2xl px-2 py-16 sm:px-0"
     >
-      <base-day-picker/>
+      <base-day-picker @selected-date="fetchTodayHabits"/>
       <base-modal :isOpen="isEditOpen" @close="closeEditModal">
         <template v-slot:title>Edit Habit</template>
         <template v-slot:content>
@@ -162,12 +162,20 @@ export default {
     };
   },
   mounted() {
-    this.fetchHabits();
+    this.fetchTodayHabits(new Date().toISOString());
   },
   methods: {
     async fetchHabits() {
       const { availableHabits } = await getHabits();
       this.habits.available = availableHabits;
+    },
+    async fetchTodayHabits(date) {
+      const { availableHabits } = await getHabitsByDay(date);
+      this.habits.available = availableHabits;
+    },
+    async toggleHabit(id) {
+      const response = await toggleHabit(id, new Date());
+      console.log(response);
     },
     closeEditModal() {
       this.isEditOpen = false;
