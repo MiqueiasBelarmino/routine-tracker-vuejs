@@ -3,6 +3,7 @@
     <div
       class="container items-center justify-center w-full max-w-2xl px-2 py-16 sm:px-0"
     >
+      <base-day-picker/>
       <base-modal :isOpen="isEditOpen" @close="closeEditModal">
         <template v-slot:title>Edit Habit</template>
         <template v-slot:content>
@@ -127,6 +128,7 @@ import BaseTabPanel from "@/components/BaseTabPanel.vue";
 import BaseWeekDayPicker from "@/shared/BaseWeekDayPicker.vue";
 import BaseModal from "@/shared/BaseModal.vue";
 import { getHabits, getHabitsByDay, toggleHabit } from "@/services/habits";
+import BaseDayPicker from "@/shared/BaseDayPicker.vue";
 
 export default {
   components: {
@@ -142,6 +144,7 @@ export default {
     BaseTabPanel,
     BaseModal,
     BaseWeekDayPicker,
+    BaseDayPicker,
   },
   data() {
     return {
