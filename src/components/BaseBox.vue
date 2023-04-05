@@ -1,12 +1,12 @@
 <template>
   <li
-    :class="[ isDone ? 'opacity-70 line-through':'',
+    :class="[ done ? 'opacity-70 line-through':'',
     'group relative flex items-center bg-white mb-2 rounded-md p-2 hover:bg-gray-100'
     ]"
     
   >
-    <uncheck-circle-icon @click="toggleItem" v-if="!isDone" class="mr-3" />
-    <check-circle-icon @click="toggleItem" v-if="isDone" class="mr-3" />
+    <uncheck-circle-icon @click="toggleItem" v-if="!done" class="mr-3" />
+    <check-circle-icon @click="toggleItem" v-if="done" class="mr-3" />
     <h3 class="text-base font-medium leading-5">
       <slot name="text" />
     </h3>
@@ -35,14 +35,8 @@ export default {
   props: {
     done: { default: false, type: Boolean },
   },
-  data() {
-    return {
-      isDone: this.done,
-    };
-  },
   methods: {
     toggleItem() {
-      this.isDone = !this.isDone;
       this.$emit('toggle');
     },
   },

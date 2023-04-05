@@ -5,7 +5,7 @@
         @click-edit="this.$emit('clickEdit')"
         @click-remove="this.$emit('clickRemove')"
         @toggle="this.$emit('toggle',item.id)"
-        :done="false"
+        :done="item.done"
         v-for="item in items"
         :key="item.id"
       >
