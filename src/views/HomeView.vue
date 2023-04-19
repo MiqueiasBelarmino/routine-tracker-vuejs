@@ -37,7 +37,10 @@
                 class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50"
               >
                 <div class="flex-auto">
-                  <a  href="/about" class="block font-semibold text-gray-900">
+                  <a
+                    @click="openCreateHabitModal"
+                    class="block font-semibold text-gray-900"
+                  >
                     Habit
                     <span class="absolute inset-0" />
                   </a>
@@ -68,10 +71,14 @@
       class="container items-center justify-center w-full max-w-2xl px-2 py-16 sm:px-0"
     >
       <base-day-picker @selected-date="selectDate" />
-      <base-modal :isOpen="isEditOpen" @close="closeEditModal">
+      <base-modal :isOpen="isCreateHabitOpen" @close="closeCreateModal">
         <template v-slot:title>Edit Habit</template>
         <template v-slot:content>
-          <base-habit-form @close-modal="closeEditModal" />
+          <base-habit-form
+            :habit="habit"
+            @save-form="createHabit"
+            @close-modal="closeCreateModal"
+          />
         </template>
       </base-modal>
 
@@ -113,7 +120,7 @@
         <TabPanels v-if="availableHabits" class="mt-4">
           <base-tab-panel
             v-if="availableHabits"
-            @click-edit="openEditModal"
+            @click-edit="openCreateHabitModal"
             @click-remove="openRemoveModal"
             @toggle="toggleHabit"
             title="Habits"
@@ -137,7 +144,12 @@ import BaseTab from "@/components/BaseTab.vue";
 import BaseTabPanel from "@/components/BaseTabPanel.vue";
 import BaseWeekDayPicker from "@/shared/BaseWeekDayPicker.vue";
 import BaseModal from "@/shared/BaseModal.vue";
-import { getHabits, getHabitsByDay, toggleHabit } from "@/services/habits";
+import {
+  getHabits,
+  getHabitsByDay,
+  toggleHabit,
+  createHabit,
+} from "@/services/habits";
 import BaseDayPicker from "@/shared/BaseDayPicker.vue";
 import BaseHabitForm from "@/shared/BaseHabitForm.vue";
 import {
@@ -181,10 +193,15 @@ export default {
   },
   data() {
     return {
-      isEditOpen: false,
+      isCreateHabitOpen: false,
       isRemoveOpen: false,
       availableHabits: [],
       selectedDate: new Date(),
+      habit: {
+        id: null,
+        name: null,
+        weekDays: [],
+      },
       todos: [
         { id: 2, name: "comprar vitamina" },
         { id: 3, name: "comprar vw 1" },
@@ -209,21 +226,25 @@ export default {
       const response = await toggleHabit(id, this.selectedDate);
       this.fetchHabitsByDate(this.selectedDate.toISOString());
     },
-    async createHabit(e){
-      e.preventDefault();
+    async createHabit(habit) {
+      await createHabit(habit)
+        .then((response) => {
+          // console.log(response);
+          this.isCreateHabitOpen = false;
+        });
     },
     selectDate(date) {
       this.selectedDate = date;
       this.fetchHabitsByDate(this.selectedDate.toISOString());
     },
-    closeEditModal() {
-      this.isEditOpen = false;
+    closeCreateModal() {
+      this.isCreateHabitOpen = false;
     },
     closeRemoveModal() {
       this.isRemoveOpen = false;
     },
-    openEditModal() {
-      this.isEditOpen = true;
+    openCreateHabitModal() {
+      this.isCreateHabitOpen = true;
     },
     openRemoveModal() {
       this.isRemoveOpen = true;

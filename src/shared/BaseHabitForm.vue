@@ -5,16 +5,17 @@
         <div class="mt-2 grid grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-6">
           <div class="col-span-full">
             <label
-              for="street-address"
+              for="name"
               class="block text-sm font-medium leading-6 text-gray-900"
               >Habit name</label
             >
             <div class="mt-2">
               <input
+                v-model="habit.name"
                 type="text"
-                name="street-address"
-                id="street-address"
-                autocomplete="street-address"
+                name="name"
+                id="name"
+                autocomplete="name"
                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
             </div>
@@ -27,7 +28,7 @@
             <legend class="text-sm font-semibold leading-6 text-gray-900">
               Week Days
             </legend>
-            <base-week-day-picker />
+            <base-week-day-picker @select-week-days="selectWeekDays"/>
           </fieldset>
         </div>
       </div>
@@ -42,8 +43,8 @@
         Cancel
       </button>
       <button
-        type="submit"
-        @click="this.$emit('closeModal')"
+        type="button"
+        @click="this.$emit('saveForm', this.habit)"
         class="rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
       >
         Save
@@ -53,15 +54,25 @@
 </template>
 
 <script>
-import BaseWeekDayPicker from './BaseWeekDayPicker.vue'
+import BaseWeekDayPicker from "./BaseWeekDayPicker.vue";
 
 export default {
-    components: {
-        BaseWeekDayPicker
+  components: {
+    BaseWeekDayPicker,
+  },
+  emits: ['selectWeekDays', 'closeModal', 'saveForm'],
+  data() {
+    return {
+      habit: {id: null, name: null, schedule: "AD", weekDays: []}
     }
-}
+  },
+  methods: {
+    selectWeekDays(weekDays){
+      this.habit.weekDays = weekDays;
+    }
+  }
+};
 </script>
 
 <style>
-
 </style>
