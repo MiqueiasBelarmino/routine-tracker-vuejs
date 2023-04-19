@@ -3,7 +3,7 @@
     <ul>
       <base-box
         @click-edit="this.$emit('clickEdit')"
-        @click-remove="this.$emit('clickRemove')"
+        @click-remove="this.$emit('clickRemove', item.id)"
         @toggle="this.$emit('toggle',item.id)"
         :done="item.done"
         v-for="item in items"

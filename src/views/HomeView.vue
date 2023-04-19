@@ -93,7 +93,7 @@
             </h3>
             <button
               data-modal-hide="popup-modal"
-              @click="closeRemoveModal"
+              @click="confirmRemove"
               type="button"
               class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
             >
@@ -149,6 +149,7 @@ import {
   getHabitsByDay,
   toggleHabit,
   createHabit,
+  deleteHabit,
 } from "@/services/habits";
 import BaseDayPicker from "@/shared/BaseDayPicker.vue";
 import BaseHabitForm from "@/shared/BaseHabitForm.vue";
@@ -197,6 +198,7 @@ export default {
       isRemoveOpen: false,
       availableHabits: [],
       selectedDate: new Date(),
+      habitIdToRemove: null,
       habit: {
         id: null,
         name: null,
@@ -227,15 +229,20 @@ export default {
       this.fetchHabitsByDate(this.selectedDate.toISOString());
     },
     async createHabit(habit) {
-      await createHabit(habit)
-        .then((response) => {
-          // console.log(response);
-          this.isCreateHabitOpen = false;
-        });
+      await createHabit(habit).then((response) => {
+        // console.log(response);
+        this.isCreateHabitOpen = false;
+      });
     },
     selectDate(date) {
       this.selectedDate = date;
       this.fetchHabitsByDate(this.selectedDate.toISOString());
+    },
+    async confirmRemove() {
+      await deleteHabit(this.habitIdToRemove).then((response) => {
+        this.closeRemoveModal();
+        this.fetchHabitsByDate(this.selectedDate.toISOString());
+      });
     },
     closeCreateModal() {
       this.isCreateHabitOpen = false;
@@ -246,7 +253,8 @@ export default {
     openCreateHabitModal() {
       this.isCreateHabitOpen = true;
     },
-    openRemoveModal() {
+    openRemoveModal(habitId) {
+      this.habitIdToRemove = habitId;
       this.isRemoveOpen = true;
     },
   },

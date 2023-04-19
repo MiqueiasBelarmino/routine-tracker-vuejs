@@ -49,3 +49,12 @@ export async function createHabit(habit) {
         // console.log(error?.message)
     }
 }
+
+export async function deleteHabit(id) {
+    try {
+        const { data } = await api.delete(`/habits/${id}`);
+        return data;
+    } catch (error) {
+        console.log(error?.message)
+    }
+}
