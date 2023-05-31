@@ -65,7 +65,6 @@
       </Popover>
     </nav>
   </header>
-
   <base-container>
     <div
       class="container items-center justify-center w-full max-w-2xl px-2 py-16 sm:px-0"
@@ -117,17 +116,28 @@
           <base-tab title="Tasks" />
         </TabList>
 
-        <TabPanels v-if="availableHabits" class="mt-4">
-          <base-tab-panel
-            v-if="availableHabits"
-            @click-edit="openCreateHabitModal"
-            @click-remove="openRemoveModal"
-            @toggle="toggleHabit"
-            title="Habits"
-            :items="availableHabits"
-          />
-          <base-tab-panel title="Tasks" :items="todos" />
-        </TabPanels>
+        <div v-if="isLoading" class="flex justify-center">
+          <div
+            class="mt-3 h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-neutral-100 motion-reduce:animate-[spin_1.5s_linear_infinite]"
+            role="status"
+          >
+            <span
+              class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+              >Loading...</span
+            >
+          </div>
+        </div>
+          <TabPanels v-else-if="!isLoading && availableHabits" class="mt-4">
+            <base-tab-panel
+              v-if="availableHabits"
+              @click-edit="openCreateHabitModal"
+              @click-remove="openRemoveModal"
+              @toggle="toggleHabit"
+              title="Habits"
+              :items="availableHabits"
+            />
+            <base-tab-panel title="Tasks" :items="todos" />
+          </TabPanels>
       </TabGroup>
     </div>
   </base-container>
@@ -196,6 +206,7 @@ export default {
     return {
       isCreateHabitOpen: false,
       isRemoveOpen: false,
+      isLoading: true,
       availableHabits: [],
       selectedDate: new Date(),
       habitIdToRemove: null,
@@ -221,7 +232,10 @@ export default {
       this.availableHabits = availableHabits;
     },
     async fetchHabitsByDate(date) {
-      const { availableHabits } = await getHabitsByDay(date);
+      this.isLoading = true;
+      const { availableHabits } = await getHabitsByDay(date).finally(() => {
+        this.isLoading = false;
+      });
       this.availableHabits = availableHabits;
     },
     async toggleHabit(id) {

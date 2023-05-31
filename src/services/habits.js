@@ -44,7 +44,7 @@ export async function createHabit(habit) {
             });
             
         });
-        //return data;
+        return data;
     } catch (error) {
         // console.log(error?.message)
     }
