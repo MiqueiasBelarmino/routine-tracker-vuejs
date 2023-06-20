@@ -1,6 +1,5 @@
 <template>
   <base-container>
-
     <div
       class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
     >
@@ -27,11 +26,12 @@
             >
             <div class="mt-2">
               <input
+                v-model="form.username"
                 id="username"
                 name="username"
                 type="text"
                 autocomplete="username"
-                required=""
+                required="true"
                 class="block w-full outline-none px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
             </div>
@@ -54,11 +54,12 @@
             </div>
             <div class="mt-2">
               <input
+                v-model="form.password"
                 id="password"
                 name="password"
                 type="password"
                 autocomplete="current-password"
-                required=""
+                required="true"
                 class="block w-full outline-none px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
             </div>
@@ -66,10 +67,24 @@
 
           <div>
             <button
-              type="submit"
+              type="button"
+              :disabled="isLoading"
+              @click="login"
               class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-              Sign in
+              <div v-if="isLoading" class="flex justify-center">
+                <div
+                  class="h-5 w-5 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] text-neutral-100 motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                  role="status"
+                >
+                  <span
+                    class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+                    >Loading...</span
+                  >
+                </div>
+              </div>
+
+              <div v-else>Sign in</div>
             </button>
           </div>
         </form>
@@ -90,12 +105,35 @@
 
 <script>
 import BaseContainer from "@/shared/BaseContainer.vue";
-
+import { authenticate } from "@/services/auth";
+import router from "@/router";
+import { mapActions } from "vuex";
 
 export default {
   name: "LoginView",
   components: {
     BaseContainer,
+  },
+  data() {
+    return {
+      form: {
+        username: null,
+        password: null,
+      },
+      isLoading: false
+    };
+  },
+  methods: {
+    ...mapActions("auth", ['doLogin']),
+    async login() {
+      if (this.form.username && this.form.password) {
+        this.isLoading = true;
+        await this.doLogin(this.form)
+          .finally(() => {
+            this.isLoading = false;
+          });
+      }
+    }
   },
 
 };
