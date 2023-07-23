@@ -28,7 +28,19 @@ export function removeLocalUser() {
     return localStorage.removeItem('rtu');
 }
 
+export function getUser() {
+    let user = store.getters["auth/getUser"];
 
+    if(!user){
+        user = getLocalUser();
+    }
+
+    if(!user){
+        return false;
+    }
+
+    return user;
+}
 
 export function addDays(date, days) {
     var date = new Date(date.valueOf());
