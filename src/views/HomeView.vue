@@ -174,6 +174,7 @@ import {
   PopoverGroup,
   PopoverPanel,
 } from "@headlessui/vue";
+import { getUser } from '@/utils/helpers';
 
 export default {
   name: "HomeView",
@@ -243,10 +244,12 @@ export default {
       this.fetchHabitsByDate(this.selectedDate.toISOString());
     },
     async createHabit(habit) {
-      await createHabit(habit).then((response) => {
-        // console.log(response);
-        this.isCreateHabitOpen = false;
-      });
+      if(getUser()){
+        await createHabit(habit).then((response) => {
+          // console.log(response);
+          this.isCreateHabitOpen = false;
+        });
+      }
     },
     selectDate(date) {
       this.selectedDate = date;

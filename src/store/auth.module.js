@@ -82,6 +82,9 @@ export default {
     getToken(state) {
       return state.token;
     },
+    getUser(state){
+      return state.user;
+    },
     hasToken(state) {
       return !!state.token;
     }

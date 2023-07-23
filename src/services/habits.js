@@ -1,5 +1,5 @@
 import api from "@/services/api"
-import { getStoreToken } from "@/utils/helpers";
+import { getStoreToken, getUser } from "@/utils/helpers";
 
 export async function getHabits() {
     try {
@@ -39,7 +39,8 @@ export async function createHabit(habit) {
         const { data } = await api.post(`/habits`, {
             "name": habit.name,
             "schedule": habit.schedule,
-            "weekDays": habit.weekDays.map(day => Number(day))
+            "weekDays": habit.weekDays.map(day => Number(day)),
+            "user_id": getUser().id
         }).then((response) => {
             console.log(response);
         }).catch (function ({response}) {
