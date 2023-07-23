@@ -71,7 +71,7 @@
     >
       <base-day-picker @selected-date="selectDate" />
       <base-modal :isOpen="isCreateHabitOpen" @close="closeCreateModal">
-        <template v-slot:title>Edit Habit</template>
+        <template v-slot:title>New Habit</template>
         <template v-slot:content>
           <base-habit-form
             :habit="habit"
