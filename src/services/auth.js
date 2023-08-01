@@ -1,11 +1,12 @@
 import api from "@/services/api"
-import { getStoreToken } from "@/utils/helpers";
+import { encrypt, getStoreToken } from "@/utils/helpers";
 
 export async function authenticate(username, password) {
     try {
+        const passwordAES = encrypt(password);    
         const { data } = await api.post(`/users/authenticate`, {
             username: username,
-            password: password,
+            password: passwordAES,
         });
 
         if(data.token && data.refreshToken.user_id){
