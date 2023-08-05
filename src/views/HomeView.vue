@@ -228,10 +228,6 @@ export default {
     this.fetchHabitsByDate(this.selectedDate.toISOString());
   },
   methods: {
-    async fetchHabits() {
-      const { availableHabits } = await getHabits();
-      this.availableHabits = availableHabits;
-    },
     async fetchHabitsByDate(date) {
       this.isLoading = true;
       const { availableHabits } = await getHabitsByDay(date).finally(() => {
