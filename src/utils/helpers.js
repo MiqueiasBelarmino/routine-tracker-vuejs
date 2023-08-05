@@ -50,6 +50,5 @@ export function addDays(date, days) {
 };
 
 export function encrypt(text){
-    console.log(`${process.env.VUE_APP_CRYPTO_SECRET_KEY}`);
     return VueCryptoJS.AES.encrypt(text, `${process.env.VUE_APP_CRYPTO_SECRET_KEY}`).toString();     
 }

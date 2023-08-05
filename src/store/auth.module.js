@@ -61,7 +61,6 @@ export default {
       return new Promise(async (resolve, reject) => {
         try {
           const { token, user } = await validateSession();
-          console.log(`DATA:USER: ${user}`);
           dispatch("setUser", user);
 
           resolve();
