@@ -12,12 +12,30 @@
         <h2
           class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900"
         >
-          Sign in to your account
+          Creat a free account
         </h2>
       </div>
 
       <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form class="space-y-6" action="#" method="POST">
+          <div>
+            <label
+              for="name"
+              class="block text-sm font-medium leading-6 text-gray-900"
+              >Name</label
+            >
+            <div class="mt-2">
+              <input
+                v-model="form.name"
+                id="name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                required="true"
+                class="block w-full outline-none px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
           <div>
             <label
               for="username"
@@ -44,13 +62,6 @@
                 class="block text-sm font-medium leading-6 text-gray-900"
                 >Password</label
               >
-              <div class="text-sm">
-                <a
-                  href="#"
-                  class="font-semibold text-indigo-600 hover:text-indigo-500"
-                  >Forgot password?</a
-                >
-              </div>
             </div>
             <div class="mt-2">
               <input
@@ -69,7 +80,7 @@
             <button
               type="button"
               :disabled="isLoading"
-              @click="login"
+              @click="create"
               class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               <div v-if="isLoading" class="flex justify-center">
@@ -84,20 +95,11 @@
                 </div>
               </div>
 
-              <div v-else>Sign in</div>
+              <div v-else>Create</div>
             </button>
           </div>
         </form>
 
-        <p class="mt-10 text-center text-sm text-gray-500">
-          Not a member?
-          {{ " " }}
-          <a
-            href="/register"
-            class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-            >Create a free account</a
-          >
-        </p>
       </div>
     </div>
   </base-container>
@@ -105,18 +107,28 @@
 
 <script>
 import BaseContainer from "@/shared/BaseContainer.vue";
-import { authenticate } from "@/services/auth";
-import router from "@/router";
 import { mapActions } from "vuex";
+import { useNotification } from 'vue-modern-notification';
+import router from "@/router";
+const toast = useNotification();
+
+const primary = ()=>{
+  toast.success({
+    title: "Success",
+    text: "Your user has been created",
+    position: 'bottom-right'
+  })
+}
 
 export default {
-  name: "LoginView",
+  name: "RegisterView",
   components: {
     BaseContainer,
   },
   data() {
     return {
       form: {
+        name: null,
         username: null,
         password: null,
       },
@@ -124,11 +136,23 @@ export default {
     };
   },
   methods: {
-    ...mapActions("auth", ['doLogin']),
-    async login() {
-      if (this.form.username && this.form.password) {
+    ...mapActions("user", ['createNewUser']),
+    async create() {
+
+      if (this.form.name && this.form.username && this.form.password) {
         this.isLoading = true;
-        await this.doLogin(this.form)
+        await this.createNewUser({
+            name: this.form.name,
+            username: this.form.username,
+            password: this.form.password
+        }).then((response)=>{
+          if(response){
+            primary();
+            setTimeout(() => {
+            router.push({name: "login" });
+          }, 3000);
+          }
+        })
           .finally(() => {
             this.isLoading = false;
           });
