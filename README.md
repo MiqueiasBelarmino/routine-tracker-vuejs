@@ -1,5 +1,7 @@
 # routine-tracker-vuejs
 
+LIVE LINK: https://app-routine.vercel.app/register
+
 ## Project setup
 ```
 npm install
