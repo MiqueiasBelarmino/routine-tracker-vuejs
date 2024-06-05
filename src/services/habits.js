@@ -10,7 +10,7 @@ export async function getHabitsByDay(date) {
         });
         return data;
     } catch (error) {
-        console.log(error?.message)
+        throw new Error(error.message);
     }
 }
 
@@ -23,7 +23,7 @@ export async function toggleHabit(id, date) {
         });
         return data;
     } catch (error) {
-        console.log(error?.message)
+        throw new Error(error.message);
     }
 }
 
@@ -36,9 +36,7 @@ export async function createHabit(habit) {
             "weekDays": habit.weekDays.map(day => Number(day)),
             "user_id": getUser().id
         }).then((response) => {
-            console.log(response);
         }).catch (function ({response}) {
-            console.log(response?.data);
             response?.data?.issues.forEach(issue => {
                 console.log(`${issue.path.join(', ')}: ${issue.message}`)
             });
@@ -46,7 +44,7 @@ export async function createHabit(habit) {
         });
         return data;
     } catch (error) {
-        // console.log(error?.message)
+        throw new Error(error.message);
     }
 }
 
@@ -58,6 +56,6 @@ export async function deleteHabit(id) {
         });
         return data;
     } catch (error) {
-        console.log(error?.message)
+        throw new Error(error.message);
     }
 }

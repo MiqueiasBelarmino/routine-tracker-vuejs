@@ -217,9 +217,9 @@ export default {
         weekDays: [],
       },
       todos: [
-        { id: 2, name: "comprar vitamina" },
-        { id: 3, name: "comprar vw 1" },
-        { id: 4, name: "ir na padaria" },
+        { id: 2, name: "book a table for 2" },
+        { id: 3, name: "apply to XPTO job" },
+        { id: 4, name: "buy groceries" },
       ],
       mobileMenuOpen: false,
     };
@@ -242,7 +242,6 @@ export default {
     async createHabit(habit) {
       if(getUser()){
         await createHabit(habit).then((response) => {
-          // console.log(response);
           this.isCreateHabitOpen = false;
         });
       }

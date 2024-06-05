@@ -14,21 +14,19 @@ export async function authenticate(username, password) {
         }
         return data;
     } catch (error) {
-        console.log(error?.message)
+        throw new Error(error.message);
     }
 }
 
 export async function createUser(user) {
+
     try {
-        api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
+        const passwordAES = encrypt(user.password);
         const { data } = await api.post(`/users`, {
-            "name": user.name,
-            "username": user.username,
-            "password": user.password
-        }).then((response) => {
-            console.log(response);
+            name: user.name,
+            username: user.username,
+            password: passwordAES
         }).catch (function ({response}) {
-            console.log(response?.data);
             response?.data?.issues.forEach(issue => {
                 console.log(`${issue.path.join(', ')}: ${issue.message}`)
             });
@@ -36,7 +34,7 @@ export async function createUser(user) {
         });
         return data;
     } catch (error) {
-        // console.log(error?.message)
+        throw new Error(error.message);
     }
 }
 
@@ -44,7 +42,6 @@ export async function validateSession() {
     try {
         api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
         const { data } = await api.get(`/users/load-session`).catch (function ({response}) {
-            console.log(response?.data);
             response?.data?.issues.forEach(issue => {
                 console.log(`${issue.path.join(', ')}: ${issue.message}`)
             });
@@ -52,6 +49,6 @@ export async function validateSession() {
         });
         return data;
     } catch (error) {
-        // console.log(error?.message)
+        throw new Error(error.message);
     }
 }
