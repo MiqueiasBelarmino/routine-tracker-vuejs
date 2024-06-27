@@ -9,8 +9,8 @@ export async function authenticate(username, password) {
             password: passwordAES,
         });
 
-        if(data.token && data.refreshToken.user_id){
-            return { name: username, token: data.token, userId: data.refreshToken.user_id, auth: true}
+        if(data.token && data.refreshToken.userId){
+            return { name: username, token: data.token, userId: data.refreshToken.userId, auth: true}
         }
         return data;
     } catch (error) {
