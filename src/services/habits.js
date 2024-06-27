@@ -6,7 +6,7 @@ export async function getHabitsByDay(date) {
         api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
         const { data } = await api.post(`/day`, {
             date: date,
-            user_id: getUser().id
+            userId: getUser().id
         });
         return data;
     } catch (error) {
@@ -19,7 +19,7 @@ export async function toggleHabit(id, date) {
         api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
         const { data } = await api.patch(`/habits/${id}/toggle`, {
             date: date,
-            user_id: getUser().id
+            userId: getUser().id
         });
         return data;
     } catch (error) {
@@ -34,7 +34,7 @@ export async function createHabit(habit) {
             "name": habit.name,
             "schedule": habit.schedule,
             "weekDays": habit.weekDays.map(day => Number(day)),
-            "user_id": getUser().id
+            "userId": getUser().id
         }).then((response) => {
         }).catch (function ({response}) {
             response?.data?.issues.forEach(issue => {
@@ -52,7 +52,7 @@ export async function deleteHabit(id) {
     try {
         api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
         const { data } = await api.delete(`/habits/${id}`, {
-            user_id: getUser().id
+            userId: getUser().id
         });
         return data;
     } catch (error) {
