@@ -141,7 +141,7 @@
             >
           </div>
         </div>
-        <TabPanels v-else-if="!isLoading && availableHabits" class="mt-4">
+        <TabPanels v-else-if="!isLoading && (availableHabits || availableTasks)" class="mt-4">
           <base-tab-panel
             v-if="availableHabits"
             @click-edit="openCreateHabitModal"
@@ -154,7 +154,7 @@
             v-if="availableTasks"
             @click-edit="openCreateTaskModal"
             @click-remove="openRemoveModal"
-            @toggle="toggleHabit"
+            @toggle="toggleSelectedTask"
             title="Tasks"
             :items="availableTasks"
           />
@@ -196,7 +196,7 @@ import {
   PopoverPanel,
 } from "@headlessui/vue";
 import { getUser } from "@/utils/helpers";
-import { createTask, getTasksByDay } from "@/services/tasks";
+import { createTask, getTasksByDay, toggleTask } from "@/services/tasks";
 export default {
   name: "HomeView",
   components: {
@@ -245,11 +245,6 @@ export default {
         name: null,
         targetDate: null,
       },
-      todos: [
-        { id: 2, name: "book a table for 2" },
-        { id: 3, name: "apply to XPTO job" },
-        { id: 4, name: "buy groceries" },
-      ],
       mobileMenuOpen: false,
     };
   },
@@ -275,6 +270,10 @@ export default {
     async toggleHabit(id) {
       const response = await toggleHabit(id, this.selectedDate);
       this.fetchHabitsByDate(this.selectedDate.toISOString());
+    },
+    async toggleSelectedTask(id) {
+      const response = await toggleTask(id, this.selectedDate);
+      this.fetchTasksByDate(this.selectedDate.toISOString());
     },
     async createHabit(habit) {
       if (getUser()) {
