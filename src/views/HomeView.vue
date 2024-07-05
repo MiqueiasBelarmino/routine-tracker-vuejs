@@ -52,9 +52,10 @@
                 class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50"
               >
                 <div class="flex-auto">
-                  <a 
+                  <a
                     @click="openCreateTaskModal"
-                    class="block font-semibold text-gray-900">
+                    class="block font-semibold text-gray-900"
+                  >
                     Task
                     <span class="absolute inset-0" />
                   </a>
@@ -140,24 +141,24 @@
             >
           </div>
         </div>
-          <TabPanels v-else-if="!isLoading && availableHabits" class="mt-4">
-            <base-tab-panel
-              v-if="availableHabits"
-              @click-edit="openCreateHabitModal"
-              @click-remove="openRemoveModal"
-              @toggle="toggleHabit"
-              title="Habits"
-              :items="availableHabits"
-            />
-            <base-tab-panel
-              v-if="availableTasks"
-              @click-edit="openCreateTaskModal"
-              @click-remove="openRemoveModal"
-              @toggle="toggleHabit"
-              title="Tasks"
-              :items="availableTasks"
-            />
-          </TabPanels>
+        <TabPanels v-else-if="!isLoading && availableHabits" class="mt-4">
+          <base-tab-panel
+            v-if="availableHabits"
+            @click-edit="openCreateHabitModal"
+            @click-remove="openRemoveModal"
+            @toggle="toggleHabit"
+            title="Habits"
+            :items="availableHabits"
+          />
+          <base-tab-panel
+            v-if="availableTasks"
+            @click-edit="openCreateTaskModal"
+            @click-remove="openRemoveModal"
+            @toggle="toggleHabit"
+            title="Tasks"
+            :items="availableTasks"
+          />
+        </TabPanels>
       </TabGroup>
     </div>
   </base-container>
@@ -194,11 +195,8 @@ import {
   PopoverGroup,
   PopoverPanel,
 } from "@headlessui/vue";
-import { getUser } from '@/utils/helpers';
-import {
-  createTask,
-  getTasksByDay
-} from "@/services/tasks";
+import { getUser } from "@/utils/helpers";
+import { createTask, getTasksByDay } from "@/services/tasks";
 export default {
   name: "HomeView",
   components: {
@@ -279,16 +277,14 @@ export default {
       this.fetchHabitsByDate(this.selectedDate.toISOString());
     },
     async createHabit(habit) {
-      if(getUser()){
+      if (getUser()) {
         await createHabit(habit).then((response) => {
           this.isCreateHabitOpen = false;
         });
       }
     },
     async newTask(task) {
-
-      console.log({task});
-      if(getUser()){
+      if (getUser()) {
         await createTask(task).then((response) => {
           this.isCreateTaskOpen = false;
         });
@@ -297,6 +293,7 @@ export default {
     selectDate(date) {
       this.selectedDate = date;
       this.fetchHabitsByDate(this.selectedDate.toISOString());
+      this.fetchTasksByDate(this.selectedDate.toISOString());
     },
     async confirmRemove() {
       await deleteHabit(this.habitIdToRemove).then((response) => {

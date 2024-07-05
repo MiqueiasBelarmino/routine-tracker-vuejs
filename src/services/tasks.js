@@ -4,7 +4,7 @@ import { getStoreToken, getUser } from "@/utils/helpers";
 export async function getTasksByDay(date) {
     try {
         api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
-        const { data } = await api.post(`/day`, {
+        const { data } = await api.post(`/tasks/day`, {
             date: date,
             userId: getUser().id
         });
@@ -32,15 +32,18 @@ export async function createTask(task) {
         api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
         const { data } = await api.post(`/tasks`, {
             name: task.name,
-            targetDate: task.date,
+            targetDate: task.targetDate,
             priority: task.priority,
             userId: getUser().id
         }).then((response) => {
-        }).catch (function ({response}) {
-            response?.data?.issues.forEach(issue => {
-                console.log(`${issue.path.join(', ')}: ${issue.message}`)
-            });
-            
+            return response.data;
+        }).catch(function ({ response }) {
+            if (response?.data?.issues) {
+                response.data.issues.forEach(issue => {
+                    console.log(`${issue.path.join(', ')}: ${issue.message}`);
+                });
+            }
+            throw new Error('Error creating task');
         });
         return data;
     } catch (error) {
