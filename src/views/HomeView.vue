@@ -52,7 +52,10 @@
                 class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50"
               >
                 <div class="flex-auto">
-                  <a class="block font-semibold text-gray-900">
+                  <a
+                    @click="openCreateTaskModal"
+                    class="block font-semibold text-gray-900"
+                  >
                     Task
                     <span class="absolute inset-0" />
                   </a>
@@ -77,6 +80,17 @@
             :habit="habit"
             @save-form="createHabit"
             @close-modal="closeCreateModal"
+          />
+        </template>
+      </base-modal>
+
+      <base-modal :isOpen="isCreateTaskOpen" @close="closeCreateTaskModal">
+        <template v-slot:title>New Task</template>
+        <template v-slot:content>
+          <base-task-form
+            :task="task"
+            @save-form="newTask"
+            @close-modal="closeCreateTaskModal"
           />
         </template>
       </base-modal>
@@ -127,17 +141,24 @@
             >
           </div>
         </div>
-          <TabPanels v-else-if="!isLoading && availableHabits" class="mt-4">
-            <base-tab-panel
-              v-if="availableHabits"
-              @click-edit="openCreateHabitModal"
-              @click-remove="openRemoveModal"
-              @toggle="toggleHabit"
-              title="Habits"
-              :items="availableHabits"
-            />
-            <base-tab-panel title="Tasks" :items="todos" />
-          </TabPanels>
+        <TabPanels v-else-if="!isLoading && (availableHabits || availableTasks)" class="mt-4">
+          <base-tab-panel
+            v-if="availableHabits"
+            @click-edit="openCreateHabitModal"
+            @click-remove="openRemoveModal"
+            @toggle="toggleHabit"
+            title="Habits"
+            :items="availableHabits"
+          />
+          <base-tab-panel
+            v-if="availableTasks"
+            @click-edit="openCreateTaskModal"
+            @click-remove="openRemoveModal"
+            @toggle="toggleSelectedTask"
+            title="Tasks"
+            :items="availableTasks"
+          />
+        </TabPanels>
       </TabGroup>
     </div>
   </base-container>
@@ -155,7 +176,6 @@ import BaseTabPanel from "@/components/BaseTabPanel.vue";
 import BaseWeekDayPicker from "@/shared/BaseWeekDayPicker.vue";
 import BaseModal from "@/shared/BaseModal.vue";
 import {
-  getHabits,
   getHabitsByDay,
   toggleHabit,
   createHabit,
@@ -163,6 +183,7 @@ import {
 } from "@/services/habits";
 import BaseDayPicker from "@/shared/BaseDayPicker.vue";
 import BaseHabitForm from "@/shared/BaseHabitForm.vue";
+import BaseTaskForm from "@/shared/BaseTaskForm.vue";
 import {
   Dialog,
   DialogPanel,
@@ -174,8 +195,8 @@ import {
   PopoverGroup,
   PopoverPanel,
 } from "@headlessui/vue";
-import { getUser } from '@/utils/helpers';
-
+import { getUser } from "@/utils/helpers";
+import { createTask, getTasksByDay, toggleTask } from "@/services/tasks";
 export default {
   name: "HomeView",
   components: {
@@ -193,6 +214,7 @@ export default {
     BaseWeekDayPicker,
     BaseDayPicker,
     BaseHabitForm,
+    BaseTaskForm,
     Dialog,
     DialogPanel,
     Disclosure,
@@ -206,9 +228,11 @@ export default {
   data() {
     return {
       isCreateHabitOpen: false,
+      isCreateTaskOpen: false,
       isRemoveOpen: false,
       isLoading: true,
       availableHabits: [],
+      availableTasks: [],
       selectedDate: new Date(),
       habitIdToRemove: null,
       habit: {
@@ -216,16 +240,17 @@ export default {
         name: null,
         weekDays: [],
       },
-      todos: [
-        { id: 2, name: "book a table for 2" },
-        { id: 3, name: "apply to XPTO job" },
-        { id: 4, name: "buy groceries" },
-      ],
+      task: {
+        id: null,
+        name: null,
+        targetDate: null,
+      },
       mobileMenuOpen: false,
     };
   },
   mounted() {
     this.fetchHabitsByDate(this.selectedDate.toISOString());
+    this.fetchTasksByDate(this.selectedDate.toISOString());
   },
   methods: {
     async fetchHabitsByDate(date) {
@@ -235,20 +260,39 @@ export default {
       });
       this.availableHabits = availableHabits;
     },
+    async fetchTasksByDate(date) {
+      this.isLoading = true;
+      const { availableTasks } = await getTasksByDay(date).finally(() => {
+        this.isLoading = false;
+      });
+      this.availableTasks = availableTasks;
+    },
     async toggleHabit(id) {
       const response = await toggleHabit(id, this.selectedDate);
       this.fetchHabitsByDate(this.selectedDate.toISOString());
     },
+    async toggleSelectedTask(id) {
+      const response = await toggleTask(id, this.selectedDate);
+      this.fetchTasksByDate(this.selectedDate.toISOString());
+    },
     async createHabit(habit) {
-      if(getUser()){
+      if (getUser()) {
         await createHabit(habit).then((response) => {
           this.isCreateHabitOpen = false;
+        });
+      }
+    },
+    async newTask(task) {
+      if (getUser()) {
+        await createTask(task).then((response) => {
+          this.isCreateTaskOpen = false;
         });
       }
     },
     selectDate(date) {
       this.selectedDate = date;
       this.fetchHabitsByDate(this.selectedDate.toISOString());
+      this.fetchTasksByDate(this.selectedDate.toISOString());
     },
     async confirmRemove() {
       await deleteHabit(this.habitIdToRemove).then((response) => {
@@ -259,11 +303,17 @@ export default {
     closeCreateModal() {
       this.isCreateHabitOpen = false;
     },
+    closeCreateTaskModal() {
+      this.isCreateTaskOpen = false;
+    },
     closeRemoveModal() {
       this.isRemoveOpen = false;
     },
     openCreateHabitModal() {
       this.isCreateHabitOpen = true;
+    },
+    openCreateTaskModal() {
+      this.isCreateTaskOpen = true;
     },
     openRemoveModal(habitId) {
       this.habitIdToRemove = habitId;
