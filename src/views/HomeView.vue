@@ -1,6 +1,6 @@
 <template>
-  <Header 
-    :openCreateHabitModal="openCreateHabitModal" 
+  <Header
+    :openCreateHabitModal="openCreateHabitModal"
     :openCreateTaskModal="openCreateTaskModal"
   />
   <base-container>
@@ -60,7 +60,7 @@
       </base-modal>
 
       <Tabs
-        :availableHabits="availableHabits"  
+        :availableHabits="availableHabits"
         :availableTasks="availableTasks"
         :open-create-habit-modal="openCreateHabitModal"
         :open-create-task-modal="openCreateTaskModal"
@@ -95,11 +95,12 @@ import {
   DialogPanel,
   Disclosure,
   DisclosureButton,
-  DisclosurePanel
+  DisclosurePanel,
 } from "@headlessui/vue";
 import { getUser } from "@/utils/helpers";
 import { createTask, getTasksByDay, toggleTask } from "@/services/tasks";
 import Tabs from "@/components/Tabs.vue";
+import { error, success } from "@/utils/toasts";
 
 export default {
   name: "HomeView",
@@ -120,7 +121,7 @@ export default {
     DisclosureButton,
     DisclosurePanel,
     Header,
-    Tabs
+    Tabs,
   },
   data() {
     return {
@@ -174,7 +175,13 @@ export default {
     },
     async createHabit(habit) {
       if (getUser()) {
-        await createHabit(habit).then((response) => {
+        let res = await createHabit(habit).then((response) => {
+          if (response?.createdHabit) {
+            success({
+              text: 'Habit created successfully.',
+            });
+            this.fetchHabitsByDate(this.selectedDate.toISOString());
+          }
           this.isCreateHabitOpen = false;
         });
       }
@@ -193,8 +200,13 @@ export default {
     },
     async confirmRemove() {
       await deleteHabit(this.habitIdToRemove).then((response) => {
+        if(response.deletedHabit){
+          success({text: "Habit deleted successfully."});
+        }
         this.closeRemoveModal();
         this.fetchHabitsByDate(this.selectedDate.toISOString());
+      }).catch((err) => {
+        error({text: "Something gone wrong."});
       });
     },
     closeCreateModal() {

@@ -1,9 +1,14 @@
 import api from "@/services/api"
 import { getStoreToken, getUser } from "@/utils/helpers";
+import { error, success } from "@/utils/toasts";
+
+function setAuthorizationHeader() {
+    api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
+}
 
 export async function getHabitsByDay(date) {
     try {
-        api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
+        setAuthorizationHeader();
         const { data } = await api.post(`/day`, {
             date: date,
             userId: getUser().id
@@ -16,7 +21,7 @@ export async function getHabitsByDay(date) {
 
 export async function toggleHabit(id, date) {
     try {
-        api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
+        setAuthorizationHeader();
         const { data } = await api.patch(`/habits/${id}/toggle`, {
             date: date,
             userId: getUser().id
@@ -29,18 +34,17 @@ export async function toggleHabit(id, date) {
 
 export async function createHabit(habit) {
     try {
-        api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
-        const { data } = await api.post(`/habits`, {
+        setAuthorizationHeader();
+        const data = await api.post(`/habits`, {
             "name": habit.name,
             "schedule": habit.schedule,
             "weekDays": habit.weekDays.map(day => Number(day)),
             "userId": getUser().id
         }).then((response) => {
-        }).catch (function ({response}) {
-            response?.data?.issues.forEach(issue => {
-                console.log(`${issue.path.join(', ')}: ${issue.message}`)
-            });
-            
+            return response.data;
+        }).catch(function ({ response }) {
+            let msg = `${response?.data?.issues[0].path.join(', ')}: ${response?.data?.issues[0].message}` ?? 'Something gone wrong.'
+            error({ text: msg });
         });
         return data;
     } catch (error) {
@@ -50,10 +54,9 @@ export async function createHabit(habit) {
 
 export async function deleteHabit(id) {
     try {
-        api.defaults.headers.common['Authorization'] = `Bearer ${getStoreToken()}`;
-        const { data } = await api.delete(`/habits/${id}`, {
-            userId: getUser().id
-        });
+        const userId = getUser().id;
+        setAuthorizationHeader();
+        const { data } = await api.delete(`/habits/${id}`);
         return data;
     } catch (error) {
         throw new Error(error.message);
